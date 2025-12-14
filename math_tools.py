@@ -2,7 +2,8 @@
 import math
 import numpy as np
 from typing import List, Union
-
+import mpmath
+from mpmath import mp
 # =========================
 # 1️⃣ 數字操作
 # =========================
@@ -24,8 +25,18 @@ def 判斷偶數(n: int) -> bool:
 def 判斷奇數(n: int) -> bool:
     return n % 2 != 0
 
-def π() -> float:
-    return math.pi
+def 獲取圓周率(獲取到幾位數:int = 5) -> float | int | None:
+    """
+    獲取到幾位數預設值為5
+    但我會限制不能獲取超過500
+    """
+    if 獲取到幾位數 >= 500:
+        pass
+    elif 獲取到幾位數 <= 1:
+        pass
+    else:
+        mp.dps = 獲取到幾位數
+        return mp.pi
 
 def 自然常數() -> float:
     return math.e

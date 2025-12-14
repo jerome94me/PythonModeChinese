@@ -10,29 +10,24 @@ try:
 except ImportError:
     win32com = None
 
-# =========================
-# 8️⃣ 隨機 & 其他工具
-# =========================
-
-# --- 隨機工具 ---
 
 
 # --- 其他工具 ---
-def 唸出文字(text:str) -> None:
+def 唸出文字(文字:str) -> None:
     """可以唸出文字 (Windows SAPI)"""
     if win32com:
         try:
             speaker = win32com.client.Dispatch("SAPI.SpVoice")
-            speaker.Speak(text)
+            speaker.Speak(文字)
         except Exception as e:
             print(f"唸出文字失敗 (Windows SAPI): {e}")
     else:
         print("未偵測到 win32com 庫，無法執行語音功能。")
     return
 
-def show_progress(items: list, description: str = "處理中"):
+def 顯示進度條(項目: list, 顯示文字: str = "處理中"):
     """使用 rich 庫顯示進度條"""
-    for i in track(items, description=description):
+    for i in track(項目, description=顯示文字):
         time.sleep(0.1)  # 模擬處理時間
 from typing import Any
 
@@ -99,7 +94,3 @@ def 烏龜_完成():
     turtle.done()
 
 # 為了簡潔，我只保留了幾個烏龜範例函式。如果需要，您可以依此模式將所有烏龜功能轉換。
-if __name__ == "__main__":
-    print(f"{檢測變數類型('Hello')}")
-    print(f"{檢測變數類型(123)}")
-    print(f"{檢測變數類型([1, 2])}")
