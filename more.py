@@ -16,13 +16,9 @@ except ImportError:
 def 唸出文字(文字:str) -> None:
     """可以唸出文字 (Windows SAPI)"""
     if win32com:
-        try:
-            speaker = win32com.client.Dispatch("SAPI.SpVoice")
-            speaker.Speak(文字)
-        except Exception as e:
-            print(f"唸出文字失敗 (Windows SAPI): {e}")
-    else:
-        print("未偵測到 win32com 庫，無法執行語音功能。")
+        speaker = win32com.client.Dispatch("SAPI.SpVoice")
+        speaker.Speak(文字)
+
     return
 
 def 顯示進度條(項目: list, 顯示文字: str = "處理中"):

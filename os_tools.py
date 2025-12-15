@@ -1,4 +1,3 @@
-# 檔案操作_工具箱_f.py
 import os
 import csv
 from typing import List, Union, Tuple, Dict, Any
@@ -136,7 +135,7 @@ def 計算路徑字數(路徑: str) -> int:
 
 
 # =========================
-# 🆕 加入 os 常用指令（method）
+# 🆕 加入 os 常用指令（method） & os.path 擴充功能
 # =========================
 
 def 建立資料夾(路徑: str) -> None:
@@ -223,6 +222,30 @@ def 是否為資料夾(路徑: str) -> bool:
     """
     return os.path.isdir(路徑)
 
+def 是否為符號連結(路徑: str) -> bool:
+    """
+    檢查指定路徑是否為一個符號連結 (Symbolic Link)。
+
+    Args:
+        路徑 (str): 欲檢查的路徑。
+
+    Returns:
+        bool: 如果是符號連結則為 True，否則為 False。
+    """
+    return os.path.islink(路徑) # 新增
+
+def 標準化路徑(路徑: str) -> str:
+    """
+    標準化路徑，消除重複的斜線、處理 '.' 和 '..' 等相對路徑表示。
+
+    Args:
+        路徑 (str): 欲標準化的路徑。
+
+    Returns:
+        str: 標準化後的路徑字串。
+    """
+    return os.path.normpath(路徑) # 新增
+
 def 取得絕對路徑(路徑: str) -> str:
     """
     將相對路徑轉換為完整的絕對路徑。
@@ -234,6 +257,30 @@ def 取得絕對路徑(路徑: str) -> str:
         str: 該路徑的絕對路徑字串。
     """
     return os.path.abspath(路徑)
+
+def 取得路徑中的檔名(路徑: str) -> str:
+    """
+    從完整路徑中提取出檔名部分 (包含副檔名)。
+
+    Args:
+        路徑 (str): 欲處理的完整路徑。
+
+    Returns:
+        str: 檔名部分。
+    """
+    return os.path.basename(路徑) # 新增
+
+def 取得路徑中的目錄(路徑: str) -> str:
+    """
+    從完整路徑中提取出目錄部分 (不含檔名)。
+
+    Args:
+        路徑 (str): 欲處理的完整路徑。
+
+    Returns:
+        str: 目錄路徑。
+    """
+    return os.path.dirname(路徑) # 新增
 
 def 路徑合併(*args: str) -> str:
     """
@@ -330,7 +377,7 @@ def 取得使用者名稱() -> str:
     """
     return os.getlogin()
 
-def 取得CPU核心數() -> int | None:
+def 取得CPU核心數() -> Union[int, None]:
     """
     取得系統中的 CPU 核心數量（邏輯或實體核心，取決於作業系統）。
 
@@ -448,7 +495,7 @@ def 取得父進程ID() -> int:
     """
     return os.getppid()
 
-def 遍歷資料夾(路徑: str) -> Dict[str, Union[str, List[str]]] | None:
+def 遍歷資料夾(路徑: str) -> Union[Dict[str, Union[str, List[str]]], None]:
     """
     遞迴遍歷指定目錄下的所有目錄和檔案（類似 os.walk 的單次迭代）。
     
