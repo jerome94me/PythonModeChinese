@@ -2,9 +2,7 @@ import os
 import csv
 from typing import List, Union, Tuple, Dict, Any
 
-# =========================
-# 5️⃣ 檔案操作（基礎讀寫與 CSV）
-# =========================
+
 def 取得當前工作目錄() -> str:
     """
     取得 Python 腳本目前執行的工作目錄 (Current Working Directory, CWD)。
@@ -509,3 +507,22 @@ def 遍歷資料夾(路徑: str) -> Union[Dict[str, Union[str, List[str]]], None
     """
     for root, dirs, files in os.walk(路徑):
         return {"路徑": root, "資料夾": dirs, "檔案": files}
+def 創建zip(zip名: str, 要加入的內容: list) -> None:
+    """
+    創建一個 .zip 檔案，並將 '要加入的內容' 列表中的所有檔案添加到其中。
+
+    Args:
+        zip名 (str): 要創建的 zip 檔案的名稱 (例如: 'archive.zip')。
+        要加入的內容 (list): 包含要壓縮的檔案路徑的列表。
+    """
+    import zipfile
+    
+    # 使用 'w' 模式 (寫入) 打開 zip 檔案
+    # 'with' 語句確保檔案在操作完成後會被正確關閉
+    with zipfile.ZipFile(file=zip名, mode="w") as zf:
+        # 遍歷 '要加入的內容' 列表中的每個檔案路徑
+        for 檔案路徑 in 要加入的內容:
+            try:
+                zf.write(檔案路徑)
+            except FileNotFoundError:
+                pass

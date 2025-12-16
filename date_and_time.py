@@ -1,7 +1,12 @@
-
-
+import calendar
 from datetime import datetime, date, timedelta
-
+"""
+變數回傳的都是英文
+"""
+星期 = calendar.day_name
+星期_縮寫 = calendar.day_abbr
+月份 = calendar.month_name
+月份_縮寫 = calendar.month_abbr
 
 
 def 取得當前完整時間() -> datetime:
