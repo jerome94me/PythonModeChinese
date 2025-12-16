@@ -2,6 +2,7 @@
 import random
 import time
 import turtle
+import playsound
 from rich.progress import track
 from typing import List, Tuple, Any, Union
 # 請注意：此庫在非 Windows 系統上可能報錯，語音功能為選擇性
@@ -60,12 +61,17 @@ def 檢測變數類型(var: Any) -> str:
     
     return result
 
-# --- 測試 ---
+def 播放mp3(path:str) -> None:
+    """
+    透過playsound來撥放音樂
+    path是mp3路徑
+    """
+    import os
+    if not os.path.exists(path):
+        pass
+    else:
+        playsound.playsound(path)
 
-# --- 烏龜繪圖 (需要特別處理狀態) ---
-# 由於 turtle 需要維護一個內部狀態 (t.Turtle() 物件)，
-# 將其轉為純函式會非常複雜且不直覺，因此我會將其函式化，
-# 但請注意，這些函式通常需要在同一繪圖環境下調用。
 
 _TURTLE_INSTANCE = None
 
