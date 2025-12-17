@@ -31,3 +31,5 @@
 - 程式語言：Python, Markdown
 
 - 用的模組：Python, Bookmarks, Vscode繁體中文補丁, Gitlens, indent-rainbow
+
+- 引用:[oxxostudio.tw](https://steam.oxxostudio.tw/)
