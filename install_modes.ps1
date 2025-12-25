@@ -17,7 +17,10 @@ $modules = @(
     "deep_translator",
     "python-barcode",
     "pillow",
-    "selenium"
+    "selenium",
+    "sounddevice",
+    "scipy",
+    "psutil"
 )
 foreach ($module in $modules) {
     Write-Host "Installing: $module ..." -ForegroundColor Yellow

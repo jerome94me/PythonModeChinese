@@ -2,7 +2,7 @@ import os
 import time
 from typing import Any, List, Optional, Union, Dict
 from rich.console import Console
-from rich.progress import *
+from rich.progress import * # type: ignore
 from rich.columns import Columns
 from rich.panel import Panel
 from rich.live import Live
@@ -46,7 +46,7 @@ class 排版引擎:
 # 2. 視覺化工具 (Visualization - 含動態進度)
 # ==========================================
 class 視覺化工具:
-    def __init__(self, console: Console):
+    def __init__(self, console: Console | Any):
         self._console = console
 
     def 渲染樹(self, 節點資料: Dict[str, Any], 標題: str = "Root"):

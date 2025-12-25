@@ -21,11 +21,6 @@ def 唸出文字(文字:str) -> None:
         speaker.Speak(文字)
 
     return
-
-def 顯示進度條(項目: list, 顯示文字: str = "處理中"):
-    """使用 rich 庫顯示進度條"""
-    for i in track(項目, description=顯示文字):
-        time.sleep(0.1)  # 模擬處理時間
 from typing import Any
 
 def 檢測變數類型(var: Any) -> str:
@@ -72,27 +67,21 @@ def 播放mp3(path:str) -> None:
     else:
         playsound.playsound(path)
 
-
-_TURTLE_INSTANCE = None
-
-def _取得烏龜實例(顏色="green", 速度=5, 筆粗=2):
-    global _TURTLE_INSTANCE
-    if _TURTLE_INSTANCE is None:
-        _TURTLE_INSTANCE = turtle.Turtle()
-        _TURTLE_INSTANCE.shape("turtle")
-        _TURTLE_INSTANCE.color(顏色)
-        _TURTLE_INSTANCE.speed(速度)
-        _TURTLE_INSTANCE.pensize(筆粗)
-    return _TURTLE_INSTANCE
-
-def 烏龜_前進(距離, 顏色="green", 速度=5, 筆粗=2):
-    _取得烏龜實例(顏色, 速度, 筆粗).forward(距離)
-
-def 烏龜_左轉(角度, 顏色="green", 速度=5, 筆粗=2):
-    _取得烏龜實例(顏色, 速度, 筆粗).left(角度)
-
-def 烏龜_完成():
-    """保持畫布開啟直到手動關閉"""
-    turtle.done()
-
-# 為了簡潔，我只保留了幾個烏龜範例函式。如果需要，您可以依此模式將所有烏龜功能轉換。
+from Console import 視覺化工具
+from Console import 控制台
+import sounddevice as sd
+from scipy.io.wavfile import write
+console = 控制台()
+show = 視覺化工具(console)
+fs = 44100
+def 錄音(self, 秒數: int, 檔名: str = "record.wav"):
+    import sounddevice as sd
+    from scipy.io.wavfile import write
+        
+    fs = 44100
+    # 配合你的「視覺化工具」顯示載入動畫
+    with console.視覺.載入中(f"[bold red]🔴 錄音中... ({秒數}秒)"):
+        錄音數據 = sd.rec(int(秒數 * fs), samplerate=fs, channels=2)
+        sd.wait()   
+    write(檔名, fs, 錄音數據)
+    console.日誌(f"✅ 錄音完成：{檔名}")
