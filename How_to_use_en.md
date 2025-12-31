@@ -8,6 +8,8 @@ The location where you save it does not matter.
 
 ## 3. Unzip the File
 You can use [7-zip](https://www.7-zip.org/) to unzip the file, as it is relatively faster.
+## 4. Install Dependency Modules
+Run install_modes.ps1 to download the required modules.
 ## 4. Start Using the Module
 Place the contents of the newly unzipped folder into your project directory.
 

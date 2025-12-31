@@ -1,110 +1,132 @@
+import os
+import time
+from typing import Any, List, Optional, Union, Dict
 from rich.console import Console
-from rich.text import Text
-from typing import Optional, Any, Union, Iterable, TextIO
+from rich.progress import * # type: ignore
+from rich.columns import Columns
+from rich.panel import Panel
+from rich.live import Live
+from rich.table import Table
+from rich.tree import Tree
+from rich.layout import Layout
+from rich.syntax import Syntax
+from rich.rule import Rule
+from rich.prompt import Prompt
+from rich.traceback import install as install_traceback
+from rich.pretty import Pretty
 
-# --- 核心類別：控制台 ---
+# ==========================================
+# 1. 核心排版引擎 (Core Layout)
+# ==========================================
+class 排版引擎:
+    def __init__(self, console: Console):
+        self._console = console
 
+    def 分隔線(self, 標題: str = "", 樣式: str = "bold blue"):
+        self._console.print(Rule(標題, style=樣式))
+
+    def 渲染並排(self, 內容列表: List[Any], 標題: str = ""):
+        面板列表 = [Panel(str(c), title=f"{標題} {i+1}", expand=True) for i, c in enumerate(內容列表)]
+        self._console.print(Columns(面板列表))
+
+    def 建立標準佈局(self) -> Layout:
+        layout = Layout()
+        layout.split_column(
+            Layout(name="header", size=3),
+            Layout(name="main"),
+            Layout(name="footer", size=3),
+        )
+        layout["main"].split_row(
+            Layout(name="side", size=30),
+            Layout(name="body")
+        )
+        return layout
+
+# ==========================================
+# 2. 視覺化工具 (Visualization - 含動態進度)
+# ==========================================
+class 視覺化工具:
+    def __init__(self, console: Console | Any):
+        self._console = console
+
+    def 渲染樹(self, 節點資料: Dict[str, Any], 標題: str = "Root"):
+        def 建立樹(目前樹: Tree, 資料: Any):
+            if isinstance(資料, dict):
+                for k, v in 資料.items():
+                    分支 = 目前樹.add(f"[bold cyan]{k}[/]")
+                    建立樹(分支, v)
+            elif isinstance(資料, list):
+                for 項 in 資料: 建立樹(目前樹, 項)
+            else:
+                目前樹.add(str(資料))
+        
+        新樹 = Tree(f"[bold yellow]{標題}[/]")
+        建立樹(新樹, 節點資料)
+        self._console.print(新樹)
+
+    def 自動表格(self, 資料: Union[Dict, List[Dict]], 標題: str = ""):
+        table = Table(title=標題)
+        if isinstance(資料, dict):
+            table.add_column("項目", style="cyan")
+            table.add_column("數值", style="magenta")
+            for k, v in 資料.items(): table.add_row(str(k), str(v))
+        elif isinstance(資料, list) and len(資料) > 0:
+            for k in 資料[0].keys(): table.add_column(k)
+            for item in 資料: table.add_row(*[str(item.get(k, "")) for k in 資料[0].keys()])
+        self._console.print(table)
+
+    def 渲染代碼(self, 代碼: str, 語言: str = "python"):
+        self._console.print(Syntax(代碼, 語言, line_numbers=True, theme="monokai"))
+
+    def 載入中(self, 訊息: str = "處理中...", 動畫類型: str = "dots"):
+        """旋轉等待動畫"""
+        return self._console.status(訊息, spinner=動畫類型)
+
+    def 建立進度條(self) -> Progress:
+        """建立高級進度條物件"""
+        return Progress(
+            SpinnerColumn(),
+            TextColumn("[progress.description]{task.description}"),
+            BarColumn(bar_width=None),
+            TaskProgressColumn(),
+            TimeElapsedColumn(),
+            console=self._console
+        )
+
+# ==========================================
+# 3. 主控制中心 (The Master Controller)
+# ==========================================
 class 控制台:
-    """
-    控制台類別：用於管理和美化終端機 (控制台) 輸出。
-    它包裝了 rich.console.Console 的主要功能。
-    """
-    def __init__(self, **kwargs: Any):
-        """
-        初始化控制台物件。
-
-        Args:
-            **kwargs: 傳遞給 rich.console.Console 的其他關鍵字參數，
-                      例如 force_terminal=True, color_system="truecolor" 等。
-        """
-        self._console = Console(**kwargs)
-
-    def 輸出(self, *物件: Any, 分隔符: str = " ", 樣式: Optional[str] = None, 
-           新行: bool = True, 消除: bool = False, 檔案: Optional[TextIO] = None) -> None:
-        """
-        將一個或多個物件輸出到控制台。
-
-        Args:
-            *物件 (Any): 要輸出的物件 (可以是多個)。
-            分隔符 (str): 輸出物件之間使用的分隔符 (預設為空格)。
-            樣式 (Optional[str]): 應用於整個輸出的 Rich 樣式字串 (例如 "bold red on white")。
-            新行 (bool): 輸出後是否換行 (預設為 True)。
-            消除 (bool): 是否移除樣式標記和特殊字元 (預設為 False)。
-            檔案 (Optional[TextIO]): 輸出到指定檔案或類檔案物件，而不是控制台。
-        """
-        self._console.print(*物件, sep=分隔符, style=樣式, end='\n' if 新行 else '', 
-                            markup=not 消除)
-
-    def 寫入(self, 文字: str, 樣式: Optional[str] = None) -> None:
-        """
-        直接寫入文字到控制台，不解析 Rich 標記。
-        這類似於 Python 內建的 print() 或 sys.stdout.write()。
-
-        Args:
-            文字 (str): 要寫入的文字。
-            樣式 (Optional[str]): 應用於整個輸出的 Rich 樣式字串。
-        """
-        self._console.print(文字, style=樣式, markup=False)
-
-    def 狀態訊息(self, 訊息: str, 啟動: bool = True) -> Any:
-        """
-        啟動或停止一個終端機狀態行 (通常在終端機底部顯示，用於進度或狀態)。
-
-        Args:
-            訊息 (str): 要顯示的狀態訊息。
-            啟動 (bool): 如果為 True，則回傳一個可在 'with' 語句中使用的狀態物件。
-                         如果為 False，則立即停止狀態訊息。
+    def __init__(self, 美化錯誤: bool = True, 紀錄模式: bool = True):
+        self._console = Console(record=紀錄模式)
         
-        Returns:
-            Any: 如果啟動為 True，回傳一個 Status 物件，否則回傳 None。
-        """
-        if 啟動:
-            return self._console.status(訊息)
-        else:
-            self._console.status(訊息).stop() # 實際上，這需要先取得物件才能調用 stop
+        # 初始化子類別
+        self.排版 = 排版引擎(self._console)
+        self.視覺 = 視覺化工具(self._console)
 
-# --- 輔助函式 ---
+        if 美化錯誤:
+            install_traceback(console=self._console, show_locals=True)
 
-def 樣式化文字(文字: str, 樣式: str) -> Text:
-    """
-    創建一個 Rich Text 物件，應用指定的樣式。
-    
-    Args:
-        文字 (str): 原始文字內容。
-        樣式 (str): Rich 樣式字串 (例如 "bold blue", "underline #ff00ff")。
-        
-    Returns:
-        Text: 樣式化的 Rich Text 物件。
-    """
-    return Text(文字, style=樣式)
+    def 輸出(self, *物件: Any, 樣式: Optional[str] = None):
+        for 項 in 物件:
+            if isinstance(項, (dict, list, tuple)):
+                self._console.print(Pretty(項, expand_all=True))
+            else:
+                self._console.print(項, style=樣式)
 
-def 取得預設控制台() -> 控制台:
-    """
-    回傳一個預設配置的控制台物件實例 (單例模式)。
-    """
-    return 控制台()
+    def 日誌(self, 文字: str):
+        self._console.log(文字)
 
-# --- 範例用法 (假設檔案名為 console_zh.py) ---
-"""
-if __name__ == '__main__':
-    # 1. 取得控制台實例
-    主控台 = 取得預設控制台()
-    
-    # 2. 基本輸出與樣式化
-    主控台.輸出("這是一條[bold green]綠色粗體[/bold green]的訊息！")
-    主控台.輸出("警告！", 樣式="yellow on black")
-    
-    # 3. 不換行輸出
-    主控台.輸出("同一行", 新行=False)
-    主控台.輸出("繼續輸出")
+    def 詢問(self, 問題: str, 選項: Optional[List[str]] = None, 預設值: Any = None):
+        """基礎互動功能，直接放在主類別"""
+        return Prompt.ask(問題, choices=選項, default=預設值, console=self._console)
 
-    # 4. 寫入 (不解析標記)
-    主控台.寫入("這段文字[bold]不會[/bold]被解析。")
+    def 安全執行(self, 函式: Any, *參數: Any, **參數組: Any):
+        try:
+            return 函式(*參數, **參數組)
+        except Exception:
+            self._console.print_exception(show_locals=True)
+            return None
 
-    # 5. 狀態訊息 (使用 'with' 語句)
-    import time
-    with 主控台.狀態訊息("[bold magenta]正在處理數據...[/bold magenta]"):
-        time.sleep(3)
-    
-    主控台.輸出("數據處理完成。")
-"""
+    def 匯出結果(self, 檔名: str = "output.html"):
+        self._console.save_html(檔名)

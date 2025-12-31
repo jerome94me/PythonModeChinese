@@ -1,5 +1,5 @@
 # 文字操作_工具箱_f.py
-
+import base64
 from deep_translator import GoogleTranslator
 from typing import List
 
@@ -147,3 +147,22 @@ def 批量翻譯(文字列表: List[str], 起始語言: str = "auto", 目標語�
 # U can test in here
 if __name__ == "__main__":
     pass
+def 字串轉base64(text):
+    """
+    字串轉base64 的 Docstring
+    將字串轉換為 Base64 字串
+    :param text: 要轉換的文字
+    """
+    text_bytes = text.encode("utf-8")
+    base64_bytes = base64.b64encode(text_bytes)
+    return base64_bytes.decode("utf-8")
+def 還原base64字串(base_text):
+    """
+    還原base64字串 的 Docstring
+    將 Base64 字串還原為原始字串
+    :param base_text: Base64 字串
+    """
+    base64_bytes = base_text.encode("utf-8")
+    original_bytes = base64.b64decode(base64_bytes)
+    return original_bytes.decode("utf-8")
+
